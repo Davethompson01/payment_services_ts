@@ -23,6 +23,7 @@
   "dependencies": {
     "@paystack/inline-js": "^2.22.7",
     "argon2": "^0.44.0",
+    "axios": "^1.13.2",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",

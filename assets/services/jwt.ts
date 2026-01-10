@@ -7,7 +7,7 @@ dotenv.config();
 export default class jwtService {
   public utilis = new Utils();
   public secret_key = process.env.SECRET_KEY!;
-  public refresh_token = process.env.REFRESH_SECRET!;
+  // public refresh_token = process.env.REFRESH_SECRET!;
 
   public async generateToken(payload: Record<string, any>): Promise<string> {
     // Convert to seconds
@@ -44,16 +44,42 @@ export default class jwtService {
     });
   }
 
+  // public async verifyToken(token: string) {
+  //   try {
+  //     // console.log("RAW TOKEN:", token);
+  //     // console.log("TOKEN TYPE:", typeof token);
+  //     // console.log("TOKEN PARTS:", token.split(".").length);
+
+  //     const decoded = jwt.verify(token, this.secret_key);
+  //     if (!decoded) {
+  //       return this.utilis.returnData(false, "Failed decoded", decoded);
+  //     }
+  //     return this.utilis.returnData(true, "Successfully decoded", decoded);
+  //   } catch (err: any) {
+  //     let message = "Error while decoding token";
+
+  //     if (err.name === "TokenExpiredError") {
+  //       message = "Token has expired";
+  //     } else if (err.name === "JsonWebTokenError") {
+  //       // message = "Invalid token returned";
+  //       return this.utilis.returnData(
+  //         false,
+  //         `error message
+  //         ${err.message}`,
+  //         err.data
+  //       );
+  //     }
+
+  //     return this.utilis.returnData(false, message, err.message);
+  //   }
+  // }
+
   public async verifyToken(token: string) {
     try {
-      // console.log("RAW TOKEN:", token);
-      // console.log("TOKEN TYPE:", typeof token);
-      // console.log("TOKEN PARTS:", token.split(".").length);
+      // Strip "Bearer " if present
+      const tokenOnly = token.replace(/^Bearer\s+/, "");
 
-      const decoded = jwt.verify(token, this.secret_key);
-      if (!decoded) {
-        return this.utilis.returnData(false, "Failed decoded", decoded);
-      }
+      const decoded = jwt.verify(tokenOnly, this.secret_key);
       return this.utilis.returnData(true, "Successfully decoded", decoded);
     } catch (err: any) {
       let message = "Error while decoding token";
@@ -61,7 +87,7 @@ export default class jwtService {
       if (err.name === "TokenExpiredError") {
         message = "Token has expired";
       } else if (err.name === "JsonWebTokenError") {
-        message = "Invalid token";
+        message = `Invalid token: ${err.message}`;
       }
 
       return this.utilis.returnData(false, message, err.message);
