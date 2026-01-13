@@ -26,7 +26,6 @@ router.get(
   authorisationMiddleWare("admin"),
   
   async (req, res) =>  {
-   
     await paystack.verifyTransaction(req, res);
   }
 );
