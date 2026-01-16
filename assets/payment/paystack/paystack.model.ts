@@ -32,7 +32,7 @@ export default class paystackModel {
       amount,
       reference: reference,
       access_code: access_code,
-      authorization: authorization_url,
+      authorization_url: authorization_url,
       status: "pending",
     });
 
@@ -54,5 +54,75 @@ export default class paystackModel {
       return this.utils.returnData(false, update.message, update.data);
     }
     return this.utils.returnData(true, update.message, update.data);
+  }
+
+  public async getPaymentHistory(user_id: number) {
+    const select = await this.dbops.select(
+      "payment_paystack",
+      ["email", "amount", "status", "payment_paystack_id"],
+      "user_id=?",
+      [user_id]
+    );
+
+    if (!select.success) {
+      return this.utils.returnData(false, select.message, []);
+    }
+
+    if (select.data < 1) {
+      return this.utils.returnData(false, "No data found", select.data);
+    }
+
+    return this.utils.returnData(true, select.message, select.data);
+  }
+
+  public async getPaymentByID(payment_paystack_id: string) {
+    const select = await this.dbops.select(
+      "payment_paystack",
+      ["email", "amount", "status", "currency", "gateway_response"],
+      "payment_paystack_id=?",
+      [payment_paystack_id]
+    );
+
+    if (!select.success) {
+      return this.utils.returnData(false, select.message, []);
+    }
+
+    if (select.data < 1) {
+      return this.utils.returnData(false, "No data found", select.data);
+    }
+
+    return this.utils.returnData(true, select.message, select.data);
+  }
+
+  public async getAllPayment(
+    payment_paystack_id: number,
+    page: number = 1,
+    limit: number = 10
+  ) {
+    const offset = (page - 1) * limit;
+
+    const select = await this.dbops.select(
+      "payment_paystack",
+      ["email", "amount", "status", "currency", "gateway_response"],
+      "payment_paystack_id = ?",
+      [payment_paystack_id],
+      limit,
+      offset
+    );
+    
+    if (!select.success) {
+      return this.utils.returnData(false, select.message, []);
+    }
+
+    if (select.data.length < 1) {
+      return this.utils.returnData(false, "No data found", []);
+    }
+
+    return this.utils.returnData(true, "Payments fetched", {
+      page,
+      limit,
+      count: select.data.length,
+      data: select.data,
+    });
   }
 }

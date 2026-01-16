@@ -136,6 +136,105 @@ export default class paystackController {
     } catch (error: any) {}
 
     // const update = await this.dbops.update("")
-    // const createTrasaction = await this.createTrasaction();
+    // cons
+    // t createTrasaction = await this.createTrasaction();
   }
+
+  public async getPaymentHistory(req: Request, res: Response) {
+    const user_id = req.user.user_id;
+    console.log(user_id);
+
+    if (!user_id) {
+      return this.utils.sendResponse(res, 401, false, "UserID is required", []);
+    }
+
+    try {
+      const result = await this.paystackModel.getPaymentHistory(user_id);
+      console.log(result);
+
+      if (!result.success) {
+        return this.utils.sendResponse(res, 401, false, result.message, []);
+      }
+      return this.utils.sendResponse(
+        res,
+        200,
+        true,
+        result.message,
+        result.data
+      );
+    } catch (error: any) {
+      return this.utils.sendResponse(
+        res,
+        401,
+        false,
+        error.message,
+        error.data
+      );
+    }
+  }
+
+  public async getPaymentByID(req: Request, res: Response) {
+    const user_id = req.user.user_id;
+    console.log(user_id);
+
+    if (!user_id) {
+      return this.utils.sendResponse(res, 401, false, "UserID is required", []);
+    }
+
+    const payment_id = req.query.paymentID as string;
+    if (!payment_id) {
+      return this.utils.sendResponse(
+        res,
+        401,
+        false,
+        "payment_id required",
+        []
+      );
+    }
+
+    try {
+      const select = await this.paystackModel.getPaymentByID(payment_id);
+      if (!select.success) {
+        return this.utils.sendResponse(res, 401, false, select.message, []);
+      }
+
+      return this.utils.sendResponse(
+        res,
+        200,
+        true,
+        select.message,
+        select.data
+      );
+    } catch (error: any) {
+      return this.utils.sendResponse(
+        res,
+        401,
+        false,
+        error.message,
+        error.data
+      );
+    }
+  }
+
+  // public async getAllpayment(req: Request, res: Response) {
+  //   const user_id = req.user.user_id;
+  //   console.log(user_id);
+
+  //   if (!user_id) {
+  //     return this.utils.sendResponse(res, 401, false, "UserID is required", []);
+  //   }
+
+  //   try {
+
+  //     const select = await this.paystackModel.getAllPayment()
+  //   } catch (error: any) {
+  //     return this.utils.sendResponse(
+  //       res,
+  //       401,
+  //       false,
+  //       error.message,
+  //       error.data
+  //     );
+  //   }
+  // }
 }

@@ -110,34 +110,26 @@ export default class dbOPS {
     offset?: number
   ) {
     if (!this.validateIdentifier(table)) {
-      return this.utils.returnData(false, "Invalid table name", table);
+      return this.utils.returnData(false, "Invalid table name", []);
     }
 
     const columnCheck = await this.validateColumns(columns);
     if (!columnCheck.success) return columnCheck;
 
     let sql = `SELECT ${columns.join(", ")} FROM ${table}`;
+    const queryParams: any[] = [...params];
 
-    // Add condition if provided
     if (condition) {
       sql += ` WHERE ${condition}`;
     }
 
-    // Add pagination if provided
-    const queryParams = [...params];
-
-    // if (limit !== undefined && offset !== undefined) {
-    //   sql += ` LIMIT ? OFFSET ?`;
-    //   queryParams.push(limit, offset);
-    // }
-
     if (limit !== undefined) {
-      sql += " LIMIT ?";
-      params.push(limit);
+      sql += ` LIMIT ?`;
+      queryParams.push(limit);
 
       if (offset !== undefined) {
-        sql += " OFFSET ?";
-        params.push(offset);
+        sql += ` OFFSET ?`;
+        queryParams.push(offset);
       }
     }
 

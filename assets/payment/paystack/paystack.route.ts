@@ -24,9 +24,31 @@ router.get(
   apiMiddleWare,
   authenicate,
   authorisationMiddleWare("admin"),
-  
-  async (req, res) =>  {
+
+  async (req, res) => {
     await paystack.verifyTransaction(req, res);
+  }
+);
+
+//get users history
+router.get(
+  "/paystackhistory",
+  apiMiddleWare,
+  authenicate,
+  authorisationMiddleWare("users", "admin"),
+  async (req, res) => {
+    await paystack.getPaymentHistory(req, res);
+  }
+);
+
+//get payment by ID
+router.get(
+  "/getPaystackTransactionByID",
+  apiMiddleWare,
+  authenicate,
+  authorisationMiddleWare("admin"),
+  async (req, res) => {
+    await paystack.getPaymentByID(req, res);
   }
 );
 
